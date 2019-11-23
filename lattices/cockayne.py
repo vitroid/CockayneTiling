@@ -161,9 +161,7 @@ def boomelang_along(edge,which):
     
 
 def drawpoly(polygon,label=""):
-    #fill(random(),1,1,0.5)
     #to check overlaps
-    fill(0,0,0,0.1)
     cx = cy = 0
     for edge in polygon.edges:
         cx += edge.start[0]
@@ -435,14 +433,13 @@ def Y(pos,edgelength,dir):
     
                     
 def test():
-    stroke(0)
+    pass
     #P((200,200),15,0)
     #X((200,200),15,0)
     #Y((200,200),15,0)
     #D((200,200),15,0)
 
 def test2(e):
-    stroke()
     t = omega**6
     x = t*e
     cx = WIDTH / 2
@@ -460,7 +457,6 @@ def test2(e):
     return polygons
 
 def test3():
-    stroke(0)
     x = 150
     t = omega**6
     D((250,250-x/2*L),x/t,0)
@@ -487,13 +483,11 @@ def test4(x):
     return polygons
 
 def test5():
-    stroke(0)
     x = 150
     decagon = decagon_at((250,250),x,0)
     polygons.append(decagon)
 
 def test6(x):
-    stroke(0)
     polygons = []
     pentagon = pentagon_at((250,250),x,0)
     polygons.append(pentagon)
@@ -506,7 +500,6 @@ def test6(x):
     return polygons
 
 def test7(x):
-    stroke(0)
     polygons = []
     pentagon = pentagon_at((250,250),x,0)
     polygons.append(pentagon)
@@ -521,7 +514,6 @@ def test7(x):
 
 
 def test8(x):
-    stroke(0)
     polygons = []
     pentagon = pentagon_at((250,250),x,0)
     polygons.append(pentagon)
@@ -553,7 +545,7 @@ def gridify(grid,pos):
     #grid: dict of known grid points
     ix = int(floor(pos[0]*1000.0+0.5))
     iy = int(floor(pos[1]*1000.0+0.5))
-    if grid.has_key((ix,iy)):
+    if (ix,iy) in grid:
         return grid[(ix,iy)]
     for dx in range(-1,2):
         for dy in range(-1,2):
@@ -594,24 +586,18 @@ def EdgeOwners(tiles):
         for j in range(len(iedges)):
             edge = iedges[j]
             rev  = iedgesr[j]
-            if edgeowners.has_key((edge.start,edge.delta)):
+            if (edge.start,edge.delta) in edgeowners:
                 edgeowners[(edge.start,edge.delta)][0] = itile
             else:
                 edgeowners[(edge.start,edge.delta)] = [None]*2
                 edgeowners[(edge.start,edge.delta)][0] = itile
-            if edgeowners.has_key((rev.start,rev.delta)):
+            if (rev.start,rev.delta) in edgeowners:
                 edgeowners[(rev.start,rev.delta)][1] = itile
             else:
                 edgeowners[(rev.start,rev.delta)] = [None]*2
                 edgeowners[(rev.start,rev.delta)][1] = itile
     return edgeowners
 
-def test_drawoutline(edgeowners):
-    strokewidth(1)
-    for edge in edgeowners:
-        if edgeowners[edge][0]==None or edgeowners[edge][1]==None:
-            line(edge[0][0]/1000.,edge[0][1]/1000.,
-                 (edge[0][0]+edge[1][0])/1000.,(edge[0][1]+edge[1][1])/1000.)
 
 
 
@@ -623,10 +609,10 @@ def set_parity2(queue,parity,edgeowners):
         itile,p = queue.pop(0)
         if itile == None:
             continue
-        if parity.has_key(itile):
+        if itile in parity:
             if parity[itile] != p:
                 drawitile(itile,0.333)
-                print itile,len(itile.edges),parity[itile]
+                # print itile,len(itile.edges),parity[itile]
             continue
         else:
             break
@@ -656,32 +642,6 @@ def set_parity2(queue,parity,edgeowners):
 
 
 
-def drawAB(pos,parity):
-    x = pos[0]/1000
-    y = pos[1]/1000
-    if parity == 1:
-        strokewidth(2)
-        stroke(0)
-        fill(1,0,1)
-    else:
-        strokewidth(1)
-        stroke(0)
-        fill(0)
-    oval(x-3,y-3,6,6)
-
-
-
-def drawX(pos):
-    x = pos[0]/1000
-    y = pos[1]/1000
-    strokewidth(1)
-    stroke(0)
-    fill(1,0,1)
-    oval(x-4,y-4,8,8)
-    nostroke()
-    fill(0)
-    oval(x-2,y-2,4,4)
-
 
 
 def decorate_triangle(tile,parity):
@@ -689,9 +649,6 @@ def decorate_triangle(tile,parity):
     c = tile.edges[0].start
     b = tile.edges[1].start
     a = tile.edges[2].start
-    drawX(a)
-    drawX(b)
-    drawX(c)
     atoms.append((a,0))
     atoms.append((b,0))
     atoms.append((c,0))
@@ -699,15 +656,12 @@ def decorate_triangle(tile,parity):
     cy = (b[1] + c[1])/2
     cx = (a[0] + cx*3) / 4
     cy = (a[1] + cy*3) / 4
-    drawAB((cx,cy),-parity)
     atoms.append(((cx,cy),-parity))
     cx = (a[0] + b[0])/2
     cy = (a[1] + b[1])/2
-    drawAB((cx,cy),parity)
     atoms.append(((cx,cy),parity))
     cx = (a[0] + c[0])/2
     cy = (a[1] + c[1])/2
-    drawAB((cx,cy),parity)
     atoms.append(((cx,cy),parity))
     return atoms
 
@@ -717,29 +671,21 @@ def decorate_rectangle(tile,parity):
     a = tile.edges[1].start
     b = tile.edges[2].start
     c = tile.edges[3].start
-    drawX(a)
-    drawX(b)
-    drawX(c)
-    drawX(d)
     atoms.append((a,0))
     atoms.append((b,0))
     atoms.append((c,0))
     atoms.append((d,0))
     cx = (a[0]*3 + b[0]*3 + c[0]*1 + d[0]*1)/8
     cy = (a[1]*3 + b[1]*3 + c[1]*1 + d[1]*1)/8
-    drawAB((cx,cy),-parity)
     atoms.append(((cx,cy),-parity))
     cx = (a[0]*1 + b[0]*1 + c[0]*3 + d[0]*3)/8
     cy = (a[1]*1 + b[1]*1 + c[1]*3 + d[1]*3)/8
-    drawAB((cx,cy),-parity)
     atoms.append(((cx,cy),-parity))
     cx = (a[0]*1 + b[0]*4 + c[0]*4 + d[0]*1)/10
     cy = (a[1]*1 + b[1]*4 + c[1]*4 + d[1]*1)/10
-    drawAB((cx,cy),parity)
     atoms.append(((cx,cy),parity))
     cx = (a[0]*4 + b[0]*1 + c[0]*1 + d[0]*4)/10
     cy = (a[1]*4 + b[1]*1 + c[1]*1 + d[1]*4)/10
-    drawAB((cx,cy),parity)
     atoms.append(((cx,cy),parity))
     return atoms
 
@@ -753,91 +699,42 @@ def decorate_house(tile,parity):
 def drawitile(polygon,p,label=""):
     #fill(random(),1,1,0.5)
     #to check overlaps
-    if p == 1:
-        fill(0,1,1,0.3) #pink
-    elif p == -1:
-        fill(0.666,1,1,0.3) #blue
+    if len(polygon.edges) == 5:
+        return decorate_house(polygon,p)
     else:
-        fill(p,1,1)
-    beginpath(polygon[0].start[0]/1000,polygon[0].start[1]/1000)
-    for i in range(1,len(polygon)):
-        lineto(polygon[i].start[0]/1000,polygon[i].start[1]/1000)
-    endpath()
-    cx = cy = 0
-    for edge in polygon.edges:
-        cx += edge.start[0]
-        cy += edge.start[1]
-    cx /= len(polygon)
-    cy /= len(polygon)
-    fill(0)
-    fontsize(9)
-    text(label,cx/1000,cy/1000)
-    if len(itile.edges) == 5:
-        return decorate_house(itile,p)
-    else:
-        return decorate_triangle(itile,p)
-
-size(1000,1000)
-colormode(HSB)
-
-stroke(0)
-strokewidth(0.5)
-edgelength = 40
-#polygons = test2(edgelength) #huge
-#polygons = test7(edgelength) #small approximant #3
-polygons = test8(edgelength) #small approximant #3
-#polygons = test6(edgelength) #small approximant #2
-#polygons = test4(edgelength) #small approximant #1
-#polygons = P((250,250),20,0)
-#for poly in polygons:
-#    drawpoly(poly)
+        return decorate_triangle(polygon,p)
 
 
-#pick up triangles and houses
-tiles = extract_augments(polygons)
-edgeowners = EdgeOwners(tiles)
-test_drawoutline(edgeowners)
+def decorate(polygons):
+    #pick up triangles and houses
+    tiles = extract_augments(polygons)
+    edgeowners = EdgeOwners(tiles)
 
-#first edge
-itile = None
-for edge in edgeowners:
-    if edgeowners[edge][0] != None and edgeowners[edge][1] != None:
-        #first tile
-        itile = edgeowners[edge][0]
-        break
-parity = dict()
-#set_parity(parity, itile, 1, edgeowners, 6)
-queue = [(itile,1)]
-while len(queue)>0:
-    set_parity2(queue,parity,edgeowners)
+    #first edge
+    itile = None
+    for edge in edgeowners:
+        if edgeowners[edge][0] != None and edgeowners[edge][1] != None:
+            #first tile
+            itile = edgeowners[edge][0]
+            break
+    parity = dict()
+    #set_parity(parity, itile, 1, edgeowners, 6)
+    queue = [(itile,1)]
+    while len(queue)>0:
+        set_parity2(queue,parity,edgeowners)
 
-
-
-atoms = []
-for itile in parity:
-    p = parity[itile]
-    atoms += drawitile(itile,p)
-
-
-
-
-#test4
-w = int(edgelength * sqrt(5) * omega**1 * 1000 + 0.5)
-h = int(omega**3 * edgelength * L * 1000 + 0.5)
-#test6
-w = int(edgelength * sqrt(5) * omega**2 * 1000 + 0.5)
-h = int(omega**2 * edgelength * L * 1000 + 0.5)
-#test8
-w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
-h = int(omega**3 * edgelength * L * 1000 + 0.5)
-depth = edgelength * 0.34    # A-X layer distance
+    atoms = []
+    for itile in parity:
+        p = parity[itile]
+        atoms += drawitile(itile,p)
+    return atoms
 
 
 def igridify(grid,pos):
     #pos: tuple of two floats
     #grid: dict of known grid points
     ix,iy = pos
-    if grid.has_key((ix,iy)):
+    if (ix,iy) in grid:
         return grid[(ix,iy)]
     for dx in range(-1,2):
         for dy in range(-1,2):
@@ -845,29 +742,62 @@ def igridify(grid,pos):
     return ix,iy
 
 
+def argparser(arg):
+    global waters, coord, cell, bondlen, density
+    edgelength = 40
 
-coord = dict()
-grid = dict()
-for atom in atoms:
-    x,y = atom[0]
-    x = (x+w) % w
-    y = (y+h) % h
-    x,y = igridify(grid,(x,y))
-    layer = atom[1]
-    z = layer * depth
-    if layer == 0:
-        coord[(x,y,z+2*depth)] = 1
-        coord[(x,y,z+6*depth)] = 1
-    coord[(x,y,z)] = 1
-    coord[(x,y,z+4*depth)] = 1
-
-nofill()
-rect(218,226,w/1000.,h/1000.)
-print "@BOX3"
-print w*1e-3,h*1e-3,depth*4*2
-print "@AR3A"
-print len(coord)
-for xyz in coord:
-    x,y,z, = xyz
-    print x/1000.,y/1000.,z
+    if arg == "4":
+        #test4
+        w = int(edgelength * sqrt(5) * omega**1 * 1000 + 0.5)
+        h = int(omega**3 * edgelength * L * 1000 + 0.5)
+        polygons = test4(edgelength) #small approximant #1
+    elif arg == "6":
+        #test6
+        w = int(edgelength * sqrt(5) * omega**2 * 1000 + 0.5)
+        h = int(omega**2 * edgelength * L * 1000 + 0.5)
+        polygons = test6(edgelength) #small approximant #2
+    else:
+        #test8
+        w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
+        h = int(omega**3 * edgelength * L * 1000 + 0.5)
+        polygons = test8(edgelength) #small approximant #3
         
+    #polygons = test2(edgelength) #huge
+    #polygons = test7(edgelength) #small approximant #3
+    #polygons = P((250,250),20,0)
+    #for poly in polygons:
+    #    drawpoly(poly)
+
+    atoms = decorate(polygons)
+
+    # set Z coord
+    depth = edgelength * 0.34    # A-X layer distance
+
+    coord = dict()
+    grid = dict()
+    for atom in atoms:
+        x,y = atom[0]
+        x = (x+w) % w
+        y = (y+h) % h
+        x,y = igridify(grid,(x,y))
+        layer = atom[1]
+        z = layer * depth
+        if layer == 0:
+            coord[(x,y,z+2*depth)] = 1
+            coord[(x,y,z+6*depth)] = 1
+        coord[(x,y,z)] = 1
+        coord[(x,y,z+4*depth)] = 1
+
+    # import yaplotlib as yp
+    import numpy as np
+    box3 = np.array((w*1e-3,h*1e-3,depth*4*2))
+    # cell matrix
+    cell = np.diag(box3)
+    # relative coord
+    coord = np.array([[x/1000,y/1000,z] for x,y,z in coord]) / box3
+
+    from genice.FrankKasper import toWater
+    waters = np.array([w for w in toWater(coord,cell)])
+    coord="relative"
+    density=0.8
+    bondlen=14
