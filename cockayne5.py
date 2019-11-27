@@ -547,6 +547,47 @@ def test8(x):
     polygons.append(penta6)
     return polygons
 
+def test9(x):
+    stroke(0)
+    polygons = []
+    decagon = decagon_at((250,250),x,0)
+    polygons.append(decagon)
+    boom1 = boomelang_along(decagon[1],1)
+    polygons.append(boom1)
+    penta1 = polygon_along(decagon[0],5)
+    polygons.append(penta1)
+    penta2 = polygon_along(boom1[3],5)
+    polygons.append(penta2)
+    boom2 = boomelang_along(boom1[4],7)
+    polygons.append(boom2)
+    penta3 = polygon_along(decagon[2],5)
+    polygons.append(penta3)
+    penta4 = polygon_along(boom1[5],5)
+    polygons.append(penta4)
+    boom3 = boomelang_along(boom1[7],4)
+    polygons.append(boom3)
+    penta5 = polygon_along(boom3[5],5)
+    polygons.append(penta5)
+    penta6 = polygon_along(boom3[6],5)
+    polygons.append(penta6)
+    boom4 = boomelang_along(boom2[4],1)
+    polygons.append(boom4)
+    deca2 = polygon_along(boom4[7],10)
+    polygons.append(deca2)
+    penta7 = polygon_along(boom2[5],5)
+    polygons.append(penta7)
+    penta8 = polygon_along(boom2[2],5)
+    polygons.append(penta8)
+    penta9 = polygon_along(boom2[3],5)
+    polygons.append(penta9)
+    penta10 = polygon_along(boom4[3],5)
+    polygons.append(penta10)
+    penta11 = polygon_along(boom4[5],5)
+    polygons.append(penta11)
+    penta12 = polygon_along(boom4[6],5)
+    polygons.append(penta12)
+    return polygons
+
 
 def gridify(grid,pos):
     #pos: tuple of two floats
@@ -788,7 +829,11 @@ edgelength = 40
 polygons = test8(edgelength) #small approximant #3
 #polygons = test6(edgelength) #small approximant #2
 #polygons = test4(edgelength) #small approximant #1
-#polygons = P((250,250),20,0)
+polygons = test9(edgelength) #small approximant #4
+#polygons = D((250,250),edgelength,0)
+#polygons = P((250,250),edgelength,0)
+#polygons = Y((250,250),edgelength,0)
+#polygons = X((250,250),edgelength,0)
 #for poly in polygons:
 #    drawpoly(poly)
 
@@ -830,6 +875,9 @@ h = int(omega**2 * edgelength * L * 1000 + 0.5)
 #test8
 w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
 h = int(omega**3 * edgelength * L * 1000 + 0.5)
+#test9
+w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
+h = int(omega**4 * edgelength * L * 1000 + 0.5)
 depth = edgelength * 0.34    # A-X layer distance
 
 
@@ -862,7 +910,7 @@ for atom in atoms:
     coord[(x,y,z+4*depth)] = 1
 
 nofill()
-rect(218,226,w/1000.,h/1000.)
+rect(250,250,w/1000.,h/1000.)
 print "@BOX3"
 print w*1e-3,h*1e-3,depth*4*2
 print "@AR3A"
