@@ -580,6 +580,58 @@ def test9(x):
     return polygons
 
 
+def ears_boomelang(boom, ears=""):
+    tiles = []
+    if "A" in ears:
+        tiles.append(polygon_along(boom[2], 5))
+    if "B" in ears or "L" in ears:
+        tiles.append(polygon_along(boom[3], 5))
+    if "C" in ears:
+        tiles.append(polygon_along(boom[4], 5))
+    if "D" in ears or "R" in ears:
+        tiles.append(polygon_along(boom[5], 5))
+    if "E" in ears:
+        tiles.append(polygon_along(boom[6], 5))
+    return tiles
+                     
+
+def test10(x):
+    polygons = []
+    decagon = decagon_at((250,250),x,0)
+    polygons.append(decagon)
+    boom1 = boomelang_along(decagon[1],7)
+    polygons.append(boom1)
+    polygons += ears_boomelang(boom1, "RL")
+    penta1 = polygon_along(boom1[6],5)
+    polygons.append(penta1)
+    boom2 = boomelang_along(penta1[2],3)
+    polygons.append(boom2)
+    polygons += ears_boomelang(boom2, "A")
+    boom3 = boomelang_along(boom2[5],7)
+    polygons.append(boom3)
+    polygons += ears_boomelang(boom3, "LC")
+    boom4 = boomelang_along(boom3[5],7)
+    polygons.append(boom4)
+    polygons += ears_boomelang(boom4, "LRE")
+    deca1 = polygon_along(boom4[1],10)
+    polygons.append(deca1)
+    boom5 = boomelang_along(deca1[3],1)
+    polygons.append(boom5)
+    polygons += ears_boomelang(boom5, "R")
+    boom6 = boomelang_along(boom5[7],4)
+    polygons.append(boom6)
+    polygons += ears_boomelang(boom6, "ABD")
+    deca2 = polygon_along(boom6[1],10)
+    polygons.append(deca2)
+    penta2 = polygon_along(deca2[5],5)
+    polygons.append(penta2)
+    penta3 = polygon_along(deca2[6],5)
+    polygons.append(penta3)
+    boom7 = boomelang_along(boom6[7],4)
+    polygons.append(boom7)
+    polygons += ears_boomelang(boom7, "ABDE")
+    return polygons
+
 
 def gridify(grid,pos):
     #pos: tuple of two floats
@@ -807,6 +859,11 @@ def argparser(arg):
         w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
         h = int(omega**4 * edgelength * L * 1000 + 0.5)
         polygons = test9(edgelength) #small approximant #4 designed by matto
+    elif arg == "10":
+        #test10
+        w = int(edgelength * sqrt(5) * omega**4 * 1000 + 0.5)
+        h = int(omega**4 * edgelength * L * 1000 + 0.5)
+        polygons = test10(edgelength) #small approximant #4 designed by matto
     
     #polygons = test2(edgelength) #huge
     #polygons = test7(edgelength) #small approximant #3
