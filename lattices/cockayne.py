@@ -1,3 +1,27 @@
+# coding: utf-8
+"""
+"""
+
+
+import genice2.lattices
+from genice2.cell import cellvectors
+from logging import getLogger
+from math import sin, pi, cos, floor, gcd
+import numpy as np
+
+
+def usage():
+    logger = getLogger()
+    logger.info(__doc__)
+
+
+desc = {
+    "ref": {
+    },
+    "usage": usage(),
+    "brief": ""
+}
+
 # ベクトルは座標の対で表現する。inflation中は、細分しかしないので、
 # 頂点の重なりは気にしない。さいごにえられたタイルを整数化する。
 # 必要ならそこからさらに細分を行う。
@@ -844,72 +868,87 @@ def igridify(grid, pos):
     return ix, iy
 
 
-def argparser(arg):
-    global waters, coord, cell, bondlen, density
-    edgelength = 40
+class Lattice(genice2.lattices.Lattice):
+    def __init__(self, **kwargs):
+        logger = getLogger()
+        # global sides, rows, bondlen, density, cell, waters, coord
 
-    if arg == "4":
-        # test4
-        w = int(edgelength * sqrt(5) * omega**1 * 1000 + 0.5)
-        h = int(omega**3 * edgelength * L * 1000 + 0.5)
-        polygons = test4(edgelength)  # small approximant #1
-    elif arg == "6":
-        # test6
-        w = int(edgelength * sqrt(5) * omega**2 * 1000 + 0.5)
-        h = int(omega**2 * edgelength * L * 1000 + 0.5)
-        polygons = test6(edgelength)  # small approximant #2
-    elif arg == "8":
-        # test8
-        w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
-        h = int(omega**3 * edgelength * L * 1000 + 0.5)
-        polygons = test8(edgelength)  # small approximant #3
-    elif arg == "9":
-        # test9
-        w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
-        h = int(omega**4 * edgelength * L * 1000 + 0.5)
-        polygons = test9(edgelength)  # small approximant #4 designed by matto
-    elif arg == "10":
-        # test10
-        w = int(edgelength * sqrt(5) * omega**4 * 1000 + 0.5)
-        h = int(omega**4 * edgelength * L * 1000 + 0.5)
-        polygons = test10(edgelength)  # small approximant #4 designed by matto
+        a = 6
+        b = 0
+        for k, v in kwargs.items():
+            if k == "size":
+                arg = int(v)
+            elif v is True:
+                # unlabeled option
+                arg = int(k)
+            else:
+                sys.exit(1)
 
-    # polygons = test2(edgelength) #huge
-    # polygons = test7(edgelength) #small approximant #3
-    #polygons = P((250,250),20,0)
-    # for poly in polygons:
-    #    drawpoly(poly)
 
-    atoms = decorate(polygons)
+        edgelength = 40
 
-    # set Z coord
-    depth = edgelength * 0.34    # A-X layer distance
+        if arg == 4:
+            # test4
+            w = int(edgelength * sqrt(5) * omega**1 * 1000 + 0.5)
+            h = int(omega**3 * edgelength * L * 1000 + 0.5)
+            polygons = test4(edgelength)  # small approximant #1
+        elif arg == 6:
+            # test6
+            w = int(edgelength * sqrt(5) * omega**2 * 1000 + 0.5)
+            h = int(omega**2 * edgelength * L * 1000 + 0.5)
+            polygons = test6(edgelength)  # small approximant #2
+        elif arg == 8:
+            # test8
+            w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
+            h = int(omega**3 * edgelength * L * 1000 + 0.5)
+            polygons = test8(edgelength)  # small approximant #3
+        elif arg == 9:
+            # test9
+            w = int(edgelength * sqrt(5) * omega**3 * 1000 + 0.5)
+            h = int(omega**4 * edgelength * L * 1000 + 0.5)
+            polygons = test9(edgelength)  # small approximant #4 designed by matto
+        elif arg == 10:
+            # test10
+            w = int(edgelength * sqrt(5) * omega**4 * 1000 + 0.5)
+            h = int(omega**4 * edgelength * L * 1000 + 0.5)
+            polygons = test10(edgelength)  # small approximant #4 designed by matto
 
-    coord = dict()
-    grid = dict()
-    for atom in atoms:
-        x, y = atom[0]
-        x = (x + w) % w
-        y = (y + h) % h
-        x, y = igridify(grid, (x, y))
-        layer = atom[1]
-        z = layer * depth
-        if layer == 0:
-            coord[(x, y, z + 2 * depth)] = 1
-            coord[(x, y, z + 6 * depth)] = 1
-        coord[(x, y, z)] = 1
-        coord[(x, y, z + 4 * depth)] = 1
+        # polygons = test2(edgelength) #huge
+        # polygons = test7(edgelength) #small approximant #3
+        #polygons = P((250,250),20,0)
+        # for poly in polygons:
+        #    drawpoly(poly)
 
-    # import yaplotlib as yp
-    import numpy as np
-    box3 = np.array((w * 1e-3, h * 1e-3, depth * 4 * 2))
-    # cell matrix
-    cell = np.diag(box3)
-    # relative coord
-    coord = np.array([[x / 1000, y / 1000, z] for x, y, z in coord]) / box3
+        atoms = decorate(polygons)
 
-    from genice.FrankKasper import toWater
-    waters = np.array([w for w in toWater(coord, cell)])
-    coord = "relative"
-    density = 0.8
-    bondlen = 14
+        # set Z coord
+        depth = edgelength * 0.34    # A-X layer distance
+
+        coord = dict()
+        grid = dict()
+        for atom in atoms:
+            x, y = atom[0]
+            x = (x + w) % w
+            y = (y + h) % h
+            x, y = igridify(grid, (x, y))
+            layer = atom[1]
+            z = layer * depth
+            if layer == 0:
+                coord[(x, y, z + 2 * depth)] = 1
+                coord[(x, y, z + 6 * depth)] = 1
+            coord[(x, y, z)] = 1
+            coord[(x, y, z + 4 * depth)] = 1
+
+        # import yaplotlib as yp
+        import numpy as np
+        box3 = np.array((w * 1e-3, h * 1e-3, depth * 4 * 2))
+        # cell matrix
+        self.cell = np.diag(box3)
+        # relative coord
+        coord = np.array([[x / 1000, y / 1000, z] for x, y, z in coord]) / box3
+
+        from genice.FrankKasper import toWater
+        self.waters = np.array([w for w in toWater(coord, self.cell)])
+        self.coord = "relative"
+        self.density = 0.8
+        self.bondlen = 14
