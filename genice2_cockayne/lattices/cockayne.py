@@ -1,5 +1,11 @@
 # coding: utf-8
 """
+A decagonal quasicrystalline clathrate hydrate approximant designed by Cockayne.
+
+genice2 cockayne[4] > co4.gro
+
+Options:
+    size: Size of the approximant (4, 6, 8, 9, or 10).
 """
 
 
@@ -8,17 +14,13 @@ from genice2.cell import cellvectors
 from logging import getLogger
 from math import sin, pi, cos, floor, gcd
 import numpy as np
-
-
-def usage():
-    logger = getLogger()
-    logger.info(__doc__)
+import sys
 
 
 desc = {
-    "ref": {
+    "ref": { "cockayne": "Cockayne 1995"
     },
-    "usage": usage(),
+    "usage": __doc__,
     "brief": ""
 }
 
@@ -199,23 +201,6 @@ def boomelang_along(edge, which):
     return Tile(edges)
 
 
-def drawpoly(polygon, label=""):
-    # to check overlaps
-    cx = cy = 0
-    for edge in polygon.edges:
-        cx += edge.start[0]
-        cy += edge.start[1]
-    cx /= len(polygon)
-    cy /= len(polygon)
-    beginpath(polygon[0].start[0], polygon[0].start[1])
-    for i in range(1, len(polygon)):
-        lineto(polygon[i].start[0], polygon[i].start[1])
-    endpath()
-    for edge in polygon:
-        if edge.augment is not None:
-            drawpoly(edge.augment)
-    fill(0)
-    text(label, cx, cy)
 
 
 def D(pos, edgelength, dir):
@@ -912,12 +897,9 @@ class Lattice(genice2.lattices.Lattice):
             w = int(edgelength * sqrt(5) * omega**4 * 1000 + 0.5)
             h = int(omega**4 * edgelength * L * 1000 + 0.5)
             polygons = test10(edgelength)  # small approximant #4 designed by matto
-
-        # polygons = test2(edgelength) #huge
-        # polygons = test7(edgelength) #small approximant #3
-        #polygons = P((250,250),20,0)
-        # for poly in polygons:
-        #    drawpoly(poly)
+        else:
+            logger.error(f"Size {arg} is not supported. Please specify one of (4,6,8,9,10).")
+            sys.exit(1)
 
         atoms = decorate(polygons)
 
@@ -947,7 +929,7 @@ class Lattice(genice2.lattices.Lattice):
         # relative coord
         coord = np.array([[x / 1000, y / 1000, z] for x, y, z in coord]) / box3
 
-        from genice.FrankKasper import toWater
+        from genice2.FrankKasper import toWater
         self.waters = np.array([w for w in toWater(coord, self.cell)])
         self.coord = "relative"
         self.density = 0.8

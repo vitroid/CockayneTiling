@@ -1,4 +1,10 @@
-*~
-*.svg
-*.png
 *.pyc
+*.png
+*.svg
+.yapviewstack
+@
+__pycache__
+*.egg-info
+build/
+dist/
+
